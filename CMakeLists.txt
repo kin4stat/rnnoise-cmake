@@ -1,25 +1,24 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.16)
+
 project(rnnoise)
 
 option(RNNOISE_COMPILE_OPUS ON)
 
-if(RNNOISE_COMPILE_OPUS)
-	add_definitions(-DCOMPILE_OPUS)
-endif()
-
-# Ignore CRT warnings on MSVC
-if(MSVC)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-
 # Get source files
 file(GLOB SOURCES "src/*.c" "src/*.h" "include/*.h")
 
-# Build rnnoise
-add_definitions(-DRNNOISE_BUILD)
-
 # Compile the library
 add_library(rnnoise ${SOURCES})
+
+target_compile_definitions(rnnoise PRIVATE RNNOISE_BUILD)
+
+if(MSVC)
+  target_compile_definitions(rnnoise PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
+
+if (${RNNOISE_COMPILE_OPUS})
+    target_compile_definitions(rnnoise PRIVATE COMPILE_OPUS)
+endif()
 
 # Build DLL if needed
 if(BUILD_SHARED_LIBS)
